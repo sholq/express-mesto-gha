@@ -15,7 +15,11 @@ module.exports.createCard = (req, res) => {
     .then(card => {
       res.send(card);
     })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(err => {
+      (err.name === 'ValidatorError') ?
+        res.status(400).send({message: 'Некорректные данные'}) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -23,7 +27,11 @@ module.exports.deleteCard = (req, res) => {
     .then(card => {
       res.send(card);
     })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(err => {
+      (err.name === 'CastError') ?
+        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.putLike = (req, res) => {
@@ -31,7 +39,11 @@ module.exports.putLike = (req, res) => {
     .then(card => {
       res.send(card);
     })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(err => {
+      (err.name === 'CastError') ?
+        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.deleteLike = (req, res) => {
@@ -39,5 +51,9 @@ module.exports.deleteLike = (req, res) => {
     .then(card => {
       res.send(card);
     })
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(err => {
+      (err.name === 'CastError') ?
+        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };

@@ -11,7 +11,11 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .then(user => res.send(user))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(err => {
+      (err.name === 'CastError') ?
+        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -19,7 +23,11 @@ module.exports.createUser = (req, res) => {
 
   User.create({name, about, avatar})
     .then(user => res.send(user))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка', err }));
+    .catch(err => {
+      (err.name === 'ValidatorError') ?
+        res.status(400).send({message: 'Некорректные данные'}) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 }
 
 module.exports.updateProfile = (req, res) => {
@@ -27,7 +35,11 @@ module.exports.updateProfile = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, {name, about}, { new: true, runValidators: true})
     .then(user => res.send(user))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка', err }));
+    .catch(err => {
+      (err.name === 'CastError') ?
+        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 }
 
 module.exports.updateAvatar = (req, res) => {
@@ -35,5 +47,9 @@ module.exports.updateAvatar = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, {avatar}, { new: true, runValidators: true})
     .then(user => res.send(user))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка', err }));
+    .catch(err => {
+      (err.name === 'CastError') ?
+        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
+        res.status(500).send({ message: 'Произошла ошибка' });
+    });
 }
