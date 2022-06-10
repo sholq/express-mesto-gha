@@ -22,12 +22,12 @@ module.exports.createCard = async (req, res) => {
       })
       .catch(err => {
         (err.name === 'CastError') ?
-          res.status(404).send({ message: 'Пользователь не был создан' }) :
+          res.status(500).send({ message: 'Пользователь не был создан' }) :
           res.status(500).send({ message: 'Произошла ошибка' });
       });
   } catch(err) {
     (err.name === 'ValidationError') ?
-      res.status(400).send({message: 'Некорректные данные'}) :
+      res.status(400).send({ message: 'Некорректные данные' }) :
       res.status(500).send({ message: 'Произошла ошибка' });
   }
 };
@@ -52,9 +52,11 @@ module.exports.putLike = (req, res) => {
       res.send(card);
     })
     .catch(err => {
-      (err.name === 'CastError') ?
-        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
-        res.status(500).send({ message: 'Произошла ошибка' });
+      (err.name === 'CastError') ? (
+        (err.path === '_id') ?
+          res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
+          res.status(400).send({ message: 'Некорректные данные' })
+      ) : res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -65,8 +67,10 @@ module.exports.deleteLike = (req, res) => {
       res.send(card);
     })
     .catch(err => {
-      (err.name === 'CastError') ?
-        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
-        res.status(500).send({ message: 'Произошла ошибка' });
+      (err.name === 'CastError') ? (
+        (err.path === '_id') ?
+          res.status(404).send({ message: 'Запрашиваемая карточка не найдена' }) :
+          res.status(400).send({ message: 'Некорректные данные' })
+      ) : res.status(500).send({ message: 'Произошла ошибка' });
     });
 };

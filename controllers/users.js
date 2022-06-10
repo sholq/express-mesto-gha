@@ -25,31 +25,51 @@ module.exports.createUser = (req, res) => {
     .then(user => res.send(user))
     .catch(err => {
       (err.name === 'ValidationError') ?
-        res.status(400).send({message: 'Некорректные данные'}) :
+        res.status(400).send({ message: 'Некорректные данные' }) :
         res.status(500).send({ message: 'Произошла ошибка' });
     });
 }
 
 module.exports.updateProfile = (req, res) => {
-  const {name, about} = req.body;
+  try {
+    const {name = false , about = false} = req.body;
 
-  User.findByIdAndUpdate(req.user._id, {name, about}, { new: true, runValidators: true})
-    .then(user => res.send(user))
-    .catch(err => {
-      (err.name === 'CastError') ?
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
-        res.status(500).send({ message: 'Произошла ошибка' });
-    });
+    if (name && about) {
+      User.findByIdAndUpdate(req.user._id, {name, about}, {new: true, runValidators: true})
+        .then(user => res.send(user))
+        .catch(err => {
+          (err.name === 'CastError') ? (
+            (err.path === "_id") ?
+              res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
+              res.status(400).send({ message: 'Некорректные данные' })
+          ) : res.status(500).send({ message: 'Произошла ошибка' });
+        });
+    } else {
+      throw new Error();
+    }
+  } catch(err) {
+    res.status(400).send({ message: 'Некорректные данные' });
+  }
 }
 
 module.exports.updateAvatar = (req, res) => {
-  const {avatar} = req.body;
+  try {
+    const {avatar = false} = req.body;
 
-  User.findByIdAndUpdate(req.user._id, {avatar}, { new: true, runValidators: true})
-    .then(user => res.send(user))
-    .catch(err => {
-      (err.name === 'CastError') ?
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
-        res.status(500).send({ message: 'Произошла ошибка' });
-    });
+    if (avatar) {
+      User.findByIdAndUpdate(req.user._id, {avatar}, { new: true, runValidators: true})
+        .then(user => res.send(user))
+        .catch(err => {
+          (err.name === 'CastError') ? (
+            (err.path === "_id") ?
+              res.status(404).send({ message: 'Запрашиваемый пользователь не найден' }) :
+              res.status(400).send({ message: 'Некорректные данные' })
+          ) : res.status(500).send({ message: 'Произошла ошибка' });
+        });
+    } else {
+      throw new Error();
+    }
+  } catch(err) {
+    res.status(400).send({ message: 'Некорректные данные' });
+  }
 }
