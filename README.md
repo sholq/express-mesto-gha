@@ -18,7 +18,7 @@ Simple server on the express.js and MongoDB.
 
 ## Installation
 
-###`npm install`
+### `npm install`
 
 ## Usage
 
