@@ -1,28 +1,28 @@
-[![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+[![Tests](https://github.com/sholq/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/sholq/express-mesto-gha/actions/workflows/tests-13-sprint.yml)
 
+[![Tests](https://github.com/sholq/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/sholq/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
 
+# Project Mesto backend
 
-## Настройка бейджей статуса тестов
-Перед началом работы над проектом рекомендуется исправить бейджи, отражающие статус прохождения тестов.
-Для этого замените разметку бейджей на следующий фрагмент, подставив вместо `${имя_пользователя}` и `${имя_репозитория}` соответствующие значения.
+<img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue.svg?cacheSeconds=2592000" />
 
-```
-[![Tests for sprint 13](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-13-sprint.yml) 
+**Description**
 
-[![Tests for sprint 14](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml)
-```
+Simple server on the express.js and MongoDB.
 
+**Technology stack**
 
-## Директории
+<img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E" /> <img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" /> <img alt="express.js" src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
-  
-Остальные директории вспомогательные, создаются при необходимости разработчиком
+**GitPages**
 
-## Запуск проекта
+[Link](https://sholq.github.io/express-mesto-gha/)
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+## Installation
+
+###`npm install`
+
+## Usage
+
+### `npm run start` — launches server   
+### `npm run dev` — launches server with hot-reload
