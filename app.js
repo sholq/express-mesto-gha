@@ -12,6 +12,7 @@ mongoose.connection.on('error', (err) => console.log('Connection failed with - '
 
 const { usersRouter } = require('./routes/users');
 const { cardsRouter } = require('./routes/cards');
+const { notFoundRouter } = require('./routes/not_found');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 });
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+app.use('/', notFoundRouter);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

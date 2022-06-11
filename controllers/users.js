@@ -12,10 +12,19 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
+    .then((user) => {
+      if (user) {
+        return res.send(user);
+      }
+      return Promise.reject(new Error('CastError'));
+    })
+    .catch(({ name = false, message = false, path = false }) => {
+      if (name || message === 'CastError') {
+        if (path) {
+          res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+        } else {
+          res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
+        }
       } else {
         res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
@@ -27,8 +36,8 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
+    .catch(({ name: err }) => {
+      if (err === 'ValidationError') {
         res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
       } else {
         res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
@@ -43,9 +52,9 @@ module.exports.updateProfile = (req, res) => {
     if (name && about) {
       User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
         .then((user) => res.send(user))
-        .catch((err) => {
-          if (err.name === 'CastError') {
-            if (err.path === '_id') {
+        .catch(({ name: err, path }) => {
+          if (err === 'CastError') {
+            if (path === '_id') {
               res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
             } else {
               res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
@@ -55,10 +64,10 @@ module.exports.updateProfile = (req, res) => {
           }
         });
     } else {
-      throw new Error();
+      throw new Error('Некорректные данные');
     }
-  } catch (err) {
-    res.status(400).send({ message: 'Некорректные данные' });
+  } catch ({ message }) {
+    res.status(400).send({ message });
   }
 };
 
@@ -81,9 +90,9 @@ module.exports.updateAvatar = (req, res) => {
           }
         });
     } else {
-      throw new Error();
+      throw new Error('Некорректные данные');
     }
-  } catch (err) {
-    res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+  } catch ({ message }) {
+    res.status(400).send({ message });
   }
 };

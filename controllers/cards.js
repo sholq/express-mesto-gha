@@ -29,8 +29,8 @@ module.exports.createCard = async (req, res) => {
           res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
         }
       });
-  } catch (err) {
-    if (err.name === 'ValidationError') {
+  } catch ({ name: err }) {
+    if (err === 'ValidationError') {
       res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
     } else {
       res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
@@ -42,11 +42,18 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .populate('owner')
     .then((card) => {
-      res.send(card);
+      if (card) {
+        return res.send(card);
+      }
+      return Promise.reject(new Error('CastError'));
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
+    .catch(({ name = false, message = false, path = false }) => {
+      if (name || message === 'CastError') {
+        if (path) {
+          res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+        } else {
+          res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
+        }
       } else {
         res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
@@ -57,14 +64,17 @@ module.exports.putLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .populate('owner')
     .then((card) => {
-      res.send(card);
+      if (card) {
+        return res.send(card);
+      }
+      return Promise.reject(new Error('CastError'));
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        if (err.path === '_id') {
-          res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
-        } else {
+    .catch(({ name = false, message = false, path = false }) => {
+      if (name || message === 'CastError') {
+        if (path) {
           res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+        } else {
+          res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
         }
       } else {
         res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
@@ -76,14 +86,17 @@ module.exports.deleteLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .populate('owner')
     .then((card) => {
-      res.send(card);
+      if (card) {
+        return res.send(card);
+      }
+      return Promise.reject(new Error('CastError'));
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        if (err.path === '_id') {
-          res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
-        } else {
+    .catch(({ name = false, message = false, path = false }) => {
+      if (name || message === 'CastError') {
+        if (path) {
           res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+        } else {
+          res.status(CAST_ERROR_CODE).send({ message: 'Запрашиваемая карточка не найдена' });
         }
       } else {
         res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
