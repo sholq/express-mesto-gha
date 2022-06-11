@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const rateLimit = require('express-rate-limit')
+const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 
 const { PORT = 3000 } = process.env;
@@ -21,7 +21,7 @@ const limiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-})
+});
 
 app.use(helmet());
 app.use(limiter);
