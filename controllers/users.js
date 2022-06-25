@@ -73,3 +73,21 @@ module.exports.updateAvatar = (req, res) => {
     res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
   }
 };
+
+module.exports.getProfile = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (user) {
+        res.send(user);
+      } else {
+        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
+      }
+    })
+    .catch(({ name }) => {
+      if (name === 'CastError') {
+        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+      } else {
+        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
+}
