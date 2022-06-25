@@ -30,14 +30,20 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .populate('owner')
     .then((card) => {
       if (card) {
-        res.send(card);
+        if (card.owner._id === req.user._id) {
+          return Card.findByIdAndRemove(req.params.cardId)
+        }
       } else {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка не найдена' });
       }
+    })
+    .populate('owner')
+    .then((card) => {
+      res.send(card);
     })
     .catch(({ name }) => {
       if (name === 'CastError') {
