@@ -37,12 +37,6 @@ app.use((req, res, next) => {
   console.log('Запрос залогирован!');
   next();
 });
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62a253b29824529d333737ee',
-  };
-  next();
-});
 app.post('/signin', login);
 app.post('/signup', createUser);
 app.use(auth);
