@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 
+require('dotenv').config();
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
