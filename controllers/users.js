@@ -31,19 +31,23 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => {
-      res.send(user);
-    })
-    .catch(({ name: err }) => {
-      if (err === 'ValidationError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+  if (validator.isEmail(email)) {
+    User.create({ name, about, avatar })
+      .then((user) => {
+        res.send(user);
+      })
+      .catch(({ name: err }) => {
+        if (err === 'ValidationError') {
+          res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+        } else {
+          res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        }
+      });
+  } else {
+    throw new Error("Bad email");
+  }
 };
 
 module.exports.updateProfile = (req, res) => {
