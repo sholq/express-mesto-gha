@@ -18,6 +18,8 @@ const { usersRouter } = require('./routes/users');
 const { cardsRouter } = require('./routes/cards');
 const { notFoundRouter } = require('./routes/not_found');
 
+const { createUser, login } = require('./controllers/users');
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -40,6 +42,8 @@ app.use((req, res, next) => {
   };
   next();
 });
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('/', notFoundRouter);
