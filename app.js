@@ -62,13 +62,21 @@ app.use('/', notFoundRouter);
 app.use(errors());
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
-    err.statusCode = DATA_ERROR_CODE;
-    err.message = 'Некорректные данные';
+    return res
+      .status(DATA_ERROR_CODE)
+      .send({
+        message: 'Некорректные данные'
+      });
   }
 
   if (err.code === 11000) {
     err.statusCode = SIGN_UP_ERROR;
     err.message = 'Пользователь уже зарегистрирован';
+    return res
+      .status(SIGN_UP_ERROR)
+      .send({
+        message: 'Пользователь уже зарегистрирован'
+      });
   }
 
   const { statusCode = COMMON_ERROR_CODE, message } = err;
