@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const { errors, celebrate, Joi} = require('celebrate');
 
 require('dotenv').config();
 
@@ -39,12 +40,23 @@ app.use((req, res, next) => {
   console.log('Запрос залогирован!');
   next();
 });
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  })
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  })
+}), createUser);
 app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('/', notFoundRouter);
+app.use(errors());
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     err.statusCode = DATA_ERROR_CODE;
