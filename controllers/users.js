@@ -1,7 +1,7 @@
 const { User } = require('../models/users');
 
-const NotFoundError = require("../errors/not-found-error");
-const DataError = require("../errors/data-error");
+const NotFoundError = require('../errors/not-found-error');
+const DataError = require('../errors/data-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -55,4 +55,4 @@ module.exports.getProfile = (req, res, next) => {
       res.send(user);
     })
     .catch(next);
-}
+};

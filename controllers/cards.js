@@ -1,7 +1,7 @@
 const { Card } = require('../models/cards');
 
-const NotFoundError = require("../errors/not-found-error");
-const AccessError = require("../errors/access-error");
+const NotFoundError = require('../errors/not-found-error');
+const AccessError = require('../errors/access-error');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -28,10 +28,9 @@ module.exports.deleteCard = (req, res, next) => {
     .populate('owner')
     .then((card) => {
       if (card.owner._id === req.user._id) {
-        return Card.findByIdAndRemove(req.params.cardId)
-      } else {
-        throw new AccessError('Ошибка доступа');
+        return Card.findByIdAndRemove(req.params.cardId);
       }
+      throw new AccessError('Ошибка доступа');
     })
     .populate('owner')
     .then((card) => {
