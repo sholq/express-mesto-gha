@@ -1,36 +1,26 @@
 const { User } = require('../models/users');
 
-const { COMMON_ERROR_CODE, NOT_FOUND_ERROR_CODE, DATA_ERROR_CODE } = require('./error_codes');
+const NotFoundError = require("../errors/not-found-error");
+const DataError = require("../errors/data-error");
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send(users);
     })
-    .catch(() => {
-      res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-    });
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
+    .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
     .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-      }
+      res.send(user);
     })
-    .catch(({ name }) => {
-      if (name === 'CastError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name = false, about = false } = req.body;
 
   if (name && about) {
@@ -38,21 +28,13 @@ module.exports.updateProfile = (req, res) => {
       .then((user) => {
         res.send(user);
       })
-      .catch(({ name: err }) => {
-        if (err === 'ValidationError') {
-          res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-        } if (err === 'CastError') {
-          res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-        } else {
-          res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-        }
-      });
+      .catch(next);
   } else {
-    res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+    throw new DataError('Некорректные данные');
   }
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar = false } = req.body;
 
   if (avatar) {
@@ -60,34 +42,17 @@ module.exports.updateAvatar = (req, res) => {
       .then((user) => {
         res.send(user);
       })
-      .catch(({ name: err }) => {
-        if (err === 'ValidationError') {
-          res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-        } if (err === 'CastError') {
-          res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-        } else {
-          res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-        }
-      });
+      .catch(next);
   } else {
-    res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
+    throw new DataError('Некорректные данные');
   }
 };
 
-module.exports.getProfile = (req, res) => {
+module.exports.getProfile = (req, res, next) => {
   User.findById(req.user._id)
+    .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
     .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
-      }
+      res.send(user);
     })
-    .catch(({ name }) => {
-      if (name === 'CastError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
 }

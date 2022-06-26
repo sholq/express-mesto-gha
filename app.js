@@ -8,6 +8,8 @@ require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
 
+const {DATA_ERROR_CODE, SIGN_UP_ERROR, COMMON_ERROR_CODE} = require("./errors/error_codes");
+
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
@@ -43,6 +45,27 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('/', notFoundRouter);
+app.use((err, req, res, next) => {
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
+    err.statusCode = DATA_ERROR_CODE;
+    err.message = 'Некорректные данные';
+  }
+
+  if (err.code === 11000) {
+    err.statusCode = SIGN_UP_ERROR;
+    err.message = 'Пользователь уже зарегистрирован';
+  }
+
+  const { statusCode = COMMON_ERROR_CODE, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === COMMON_ERROR_CODE
+        ? 'На сервере произошла ошибка'
+        : message
+    });
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

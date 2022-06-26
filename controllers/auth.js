@@ -1,33 +1,29 @@
 const {User} = require("../models/users");
+const {NODE_ENV, JWT_SECRET} = process.env;
 
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
-const {DATA_ERROR_CODE, COMMON_ERROR_CODE} = require("./error_codes");
+const DataError = require("../errors/data-error");
+const AuthError = require("../errors/auth-error");
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
 
   if (validator.isEmail(email)) {
     bcrypt.hash(password, 10)
       .then(hash => User.create({ name, about, avatar, email, password: hash }))
-      .then((user) => {
-        res.send(user);
+      .then(({_id, name, about, avatar, email}) => {
+        res.send({ _id, name, about, avatar, email });
       })
-      .catch(({ name: err }) => {
-        if (err === 'ValidationError') {
-          res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-        } else {
-          res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-        }
-      });
+      .catch(next);
   } else {
-    throw new Error("Bad email");
+     next(new DataError('Некорректные данные'));
   }
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -42,12 +38,11 @@ module.exports.login = (req, res) => {
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
+          sameSite: true
         })
         .end();
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
+      next(new AuthError(err.message))
     });
 };

@@ -1,93 +1,61 @@
 const { Card } = require('../models/cards');
 
-const { COMMON_ERROR_CODE, NOT_FOUND_ERROR_CODE, DATA_ERROR_CODE } = require('./error_codes');
+const NotFoundError = require("../errors/not-found-error");
+const AccessError = require("../errors/access-error");
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate('owner')
     .then((cards) => {
       res.send(cards);
     })
-    .catch(() => {
-      res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
       res.send(card);
     })
-    .catch(({ name: err }) => {
-      if (err === 'ValidationError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
+    .orFail(new NotFoundError('Карточка не найдена'))
     .populate('owner')
     .then((card) => {
-      if (card) {
-        if (card.owner._id === req.user._id) {
-          return Card.findByIdAndRemove(req.params.cardId)
-        }
+      if (card.owner._id === req.user._id) {
+        return Card.findByIdAndRemove(req.params.cardId)
       } else {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка не найдена' });
+        throw new AccessError('Ошибка доступа');
       }
     })
     .populate('owner')
     .then((card) => {
       res.send(card);
     })
-    .catch(({ name }) => {
-      if (name === 'CastError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.putLike = (req, res) => {
+module.exports.putLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .orFail(new NotFoundError('Карточка не найдена'))
     .populate('owner')
     .then((card) => {
-      if (card) {
-        res.send(card);
-      } else {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка не найдена' });
-      }
+      res.send(card);
     })
-    .catch(({ name }) => {
-      if (name === 'CastError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.deleteLike = (req, res) => {
+module.exports.deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+    .orFail(new NotFoundError('Карточка не найдена'))
     .populate('owner')
     .then((card) => {
-      if (card) {
-        res.send(card);
-      } else {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка не найдена' });
-      }
+      res.send(card);
     })
-    .catch(({ name }) => {
-      if (name === 'CastError') {
-        res.status(DATA_ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.status(COMMON_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+    .catch(next);
 };
