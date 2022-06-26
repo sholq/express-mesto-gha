@@ -27,12 +27,11 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(new NotFoundError('Карточка не найдена'))
     .populate('owner')
     .then((card) => {
-      if (card.owner._id === req.user._id) {
+      if (String(card.owner._id) === req.user._id) {
         return Card.findByIdAndRemove(req.params.cardId);
       }
-      throw new AccessError('Ошибка доступа');
+      return next(new AccessError('Ошибка доступа'));
     })
-    .populate('owner')
     .then((card) => {
       res.send(card);
     })
