@@ -41,7 +41,7 @@ module.exports.login = (req, res, next) => {
         { expiresIn: '7d' },
       );
 
-      res.send({ token, message: "Вы вошли" });
+      res.send({ token, message: 'Вы вошли' });
     })
     .catch((err) => {
       next(new AuthError(err.message));

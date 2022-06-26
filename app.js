@@ -63,30 +63,36 @@ app.use('/', notFoundRouter);
 app.use(errors());
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
-    return res
+    res
       .status(DATA_ERROR_CODE)
       .send({
         message: 'Некорректные данные',
       });
+
+    next();
   }
 
   if (err.code === 11000) {
-    return res
+    res
       .status(SIGN_UP_ERROR)
       .send({
         message: 'Пользователь уже зарегистрирован',
       });
+
+    next();
   }
 
   const { statusCode = COMMON_ERROR_CODE, message } = err;
 
-  return res
+  res
     .status(statusCode)
     .send({
       message: statusCode === COMMON_ERROR_CODE
         ? 'На сервере произошла ошибка'
         : message,
     });
+
+  next();
 });
 
 app.listen(PORT, () => {
