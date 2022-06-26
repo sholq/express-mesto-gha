@@ -40,7 +40,7 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true
         })
-        .end();
+        .send({message: "Вы вошли!"});
     })
     .catch((err) => {
       next(new AuthError(err.message))

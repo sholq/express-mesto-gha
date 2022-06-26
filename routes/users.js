@@ -5,12 +5,12 @@ const {
 
 usersRouter.get('/', getUsers);
 
-usersRouter.get('/:userId', getUser);
-
 usersRouter.get('/me', getProfile);
 
 usersRouter.patch('/me', updateProfile);
 
 usersRouter.patch('/me/avatar', updateAvatar);
+
+usersRouter.get('/:userId', getUser);
 
 module.exports = { usersRouter };
