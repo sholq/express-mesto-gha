@@ -62,8 +62,6 @@ app.use('/cards', cardsRouter);
 app.use('/', notFoundRouter);
 app.use(errors());
 app.use((err, req, res, next) => {
-  console.log(err);
-
   if (err.name === 'ValidationError' || err.name === 'CastError') {
     return res
       .status(DATA_ERROR_CODE)
