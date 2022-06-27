@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { isEmail } = require('validator');
 
 const DataError = require('../errors/data-error');
-
-const { urlRegEx } = require('../regex/regex');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -26,7 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: [urlRegEx, 'Некорректные данные'],
+    validation: [isEmail, 'Некорректные данные'],
   },
   password: {
     type: String,
