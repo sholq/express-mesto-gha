@@ -1,8 +1,8 @@
 const notFoundRouter = require('express').Router();
-const { NOT_FOUND_ERROR_CODE } = require('../errors/error_codes');
+const { NotFoundError } = require('../errors/not-found-error');
 
-notFoundRouter.all('/*', (req, res) => {
-  res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Некорректные данные' });
+notFoundRouter.all('/*', (req, res, next) => {
+  next(new NotFoundError('Некорректные данные'));
 });
 
 module.exports = { notFoundRouter };

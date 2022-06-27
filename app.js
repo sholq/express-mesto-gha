@@ -9,8 +9,6 @@ require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
 
-const { DATA_ERROR_CODE, SIGN_UP_ERROR, COMMON_ERROR_CODE } = require('./errors/error_codes');
-
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
@@ -22,7 +20,10 @@ const { cardsRouter } = require('./routes/cards');
 const { notFoundRouter } = require('./routes/not_found');
 
 const { createUser, login } = require('./controllers/auth');
+
 const auth = require('./middlewares/auth');
+const { handleErrors } = require('./middlewares/errors');
+
 const { urlRegEx } = require('./regex/regex');
 
 const limiter = rateLimit({
@@ -61,39 +62,7 @@ app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('/', notFoundRouter);
 app.use(errors());
-app.use((err, req, res, next) => {
-  if (err.name === 'ValidationError' || err.name === 'CastError') {
-    res
-      .status(DATA_ERROR_CODE)
-      .send({
-        message: 'Некорректные данные',
-      });
-
-    next();
-  }
-
-  if (err.code === 11000) {
-    res
-      .status(SIGN_UP_ERROR)
-      .send({
-        message: 'Пользователь уже зарегистрирован',
-      });
-
-    next();
-  }
-
-  const { statusCode = COMMON_ERROR_CODE, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === COMMON_ERROR_CODE
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-
-  next();
-});
+app.use(handleErrors);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
