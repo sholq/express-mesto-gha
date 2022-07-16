@@ -26,6 +26,8 @@ const { handleErrors } = require('./middlewares/errors');
 
 const { urlRegEx } = require('./regex/regex');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -42,6 +44,7 @@ app.use((req, res, next) => {
   console.log('Запрос залогирован!');
   next();
 });
+app.use(requestLogger);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -61,6 +64,7 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('/', notFoundRouter);
+app.use(errorLogger);
 app.use(errors());
 app.use(handleErrors);
 
